@@ -1,8 +1,10 @@
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: [],
   turbopack: {
+    root: "../",
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
