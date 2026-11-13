@@ -281,7 +281,6 @@ export default function AdminRoomsPage() {
         ),
       );
 
-      // Perbarui nama tipe pada unit kamar jika berubah
       if (oldName !== name) {
         setRooms((current) =>
           current.map((room) => (room.type === oldName ? { ...room, type: name } : room)),
@@ -305,60 +304,46 @@ export default function AdminRoomsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] text-[#343A3D]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F5F0E8] text-[#343A3D]">
       <AdminSidebar />
 
-      <div className="ml-[210px] min-h-screen">
+      <div className="min-h-screen min-w-0 w-full md:ml-[210px] md:w-[calc(100%-210px)]">
         <AdminTopbar />
 
-        <main className="px-8 pb-16 pt-8">
+        <main className="w-full min-w-0 px-4 pb-10 pt-[84px] sm:px-6 md:px-8 md:pb-16 md:pt-[74px]">
           {/* Judul halaman */}
           <section className="mb-7">
-            <h1 className="font-heading text-3xl font-semibold text-[#192B35]">Manajemen Kamar</h1>
+            <h1 className="font-heading text-2xl font-semibold text-[#192B35] sm:text-3xl">
+              Manajemen Kamar
+            </h1>
             <p className="mt-1 text-[13px] text-gray-500">
               Tipe, unit, fasilitas, status, dan tarif.
             </p>
           </section>
 
           {/* Ringkasan kamar */}
-          <section className="mb-7 grid grid-cols-4 gap-3">
+          <section className="mb-7 grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
-              {
-                label: "Total Unit Kamar",
-                value: totalRooms,
-                color: "#C6A46A",
-              },
-              {
-                label: "Kamar Tersedia",
-                value: availableRooms,
-                color: "#A5B1A0",
-              },
-              {
-                label: "Kamar Terisi",
-                value: occupiedRooms,
-                color: "#192B35",
-              },
-              {
-                label: "Dalam Perawatan",
-                value: maintenanceRooms,
-                color: "#C58A80",
-              },
+              { label: "Total Unit Kamar", value: totalRooms, color: "#C6A46A" },
+              { label: "Kamar Tersedia", value: availableRooms, color: "#A5B1A0" },
+              { label: "Kamar Terisi", value: occupiedRooms, color: "#192B35" },
+              { label: "Dalam Perawatan", value: maintenanceRooms, color: "#C58A80" },
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-[16px] border border-[#E2D8C8] bg-[#FFFDFA] px-4 py-4"
+                className="min-w-0 rounded-[16px] border border-[#E2D8C8] bg-[#FFFDFA] px-4 py-4"
                 style={{ borderTop: `4px solid ${item.color}` }}
               >
                 <p className="font-heading text-3xl font-semibold text-[#192B35]">{item.value}</p>
-                <p className="mt-2 text-sm text-gray-600">{item.label}</p>
+                <p className="mt-2 text-xs text-gray-600 sm:text-sm">{item.label}</p>
               </div>
             ))}
           </section>
 
           {/* Panel utama dengan dua tab */}
-          <section className="rounded-[20px] border border-[#E2D8C8] bg-[#FFFDFA] p-6">
+          <section className="min-w-0 rounded-[20px] border border-[#E2D8C8] bg-[#FFFDFA] p-4 sm:p-5 md:p-6">
             {/* Tab */}
-            <div className="mb-6 flex gap-2">
+            <div className="mb-6 flex flex-wrap gap-2">
               <button
                 onClick={() => {
                   setActiveTab("type");
@@ -389,7 +374,7 @@ export default function AdminRoomsPage() {
             </div>
 
             {/* Pencarian, filter, dan tombol tambah */}
-            <div className="mb-6 flex flex-wrap items-center gap-3">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <input
                 type="text"
                 placeholder={
@@ -404,7 +389,7 @@ export default function AdminRoomsPage() {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="rounded-lg border border-[#DED8CE] bg-white px-3 py-2 text-xs outline-none focus:border-[#C6A46A]"
+                  className="w-full rounded-lg border border-[#DED8CE] bg-white px-3 py-2 text-xs outline-none focus:border-[#C6A46A] sm:w-auto"
                 >
                   <option value="Semua">Semua Status</option>
                   <option value="Tersedia">Tersedia</option>
@@ -417,7 +402,7 @@ export default function AdminRoomsPage() {
               <button
                 onClick={activeTab === "unit" ? openAddRoom : openAddType}
                 disabled={activeTab === "unit" && roomTypes.length === 0}
-                className="ml-auto rounded-lg bg-[#C6A46A] px-4 py-2 text-xs font-medium text-[#192B35] transition hover:bg-[#B8955D] disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-lg bg-[#C6A46A] px-4 py-2 text-xs font-medium text-[#192B35] transition hover:bg-[#B8955D] disabled:cursor-not-allowed disabled:opacity-50 sm:ml-auto sm:w-auto"
               >
                 {activeTab === "unit" ? "+ Unit Kamar" : "+ Tipe Kamar"}
               </button>
@@ -426,8 +411,8 @@ export default function AdminRoomsPage() {
             {/* TAB UNIT KAMAR */}
             {activeTab === "unit" && (
               <>
-                <div className="w-full">
-                  <table className="w-full table-fixed text-left text-xs">
+                <div className="w-full overflow-x-auto">
+                  <table className="w-full min-w-[650px] table-fixed text-left text-xs md:min-w-0">
                     <thead className="border-b border-[#E2D8C8] text-[11px] uppercase text-gray-500">
                       <tr>
                         <th className="w-[6%] px-2 py-3 font-medium">No.</th>
@@ -489,8 +474,8 @@ export default function AdminRoomsPage() {
             {/* TAB TIPE DAN TARIF */}
             {activeTab === "type" && (
               <>
-                <div className="w-full">
-                  <table className="w-full table-fixed text-left text-[11px]">
+                <div className="w-full overflow-x-auto">
+                  <table className="w-full min-w-[850px] table-fixed text-left text-[11px] md:min-w-0">
                     <thead className="border-b border-[#E2D8C8] text-[10px] uppercase text-gray-500">
                       <tr>
                         <th className="w-[5%] px-2 py-3 font-medium">No.</th>
@@ -511,25 +496,17 @@ export default function AdminRoomsPage() {
                             className="border-b border-[#EEEAE3] hover:bg-[#FAF9F6]"
                           >
                             <td className="px-2 py-3 text-gray-500">{index + 1}</td>
-
-                            {/* Kolom tipe kamar */}
                             <td className="break-words px-2 py-3 font-semibold text-[#192B35]">
                               {type.name}
                             </td>
-
-                            {/* Kolom deskripsi terpisah */}
                             <td className="break-words px-2 py-3 leading-5 text-gray-500">
                               {type.description}
                             </td>
-
                             <td className="px-2 py-3">{type.capacity} orang</td>
-
                             <td className="break-words px-2 py-3 leading-5">{type.facilities}</td>
-
                             <td className="break-words px-2 py-3 font-medium text-[#192B35]">
                               {formatRupiah(type.price)}
                             </td>
-
                             <td className="px-2 py-3 text-center">
                               <button
                                 onClick={() => openEditType(type)}
@@ -562,8 +539,8 @@ export default function AdminRoomsPage() {
 
       {/* MODAL TAMBAH / EDIT UNIT KAMAR */}
       {showRoomModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="my-auto w-full max-w-lg rounded-[20px] bg-[#FFFDFA] p-7 shadow-xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-3 sm:p-4">
+          <div className="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[20px] bg-[#FFFDFA] p-5 shadow-xl sm:p-7 md:max-h-none">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="font-heading text-2xl font-semibold text-[#192B35]">
@@ -593,7 +570,7 @@ export default function AdminRoomsPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium">Tipe Kamar</label>
                   <select
@@ -644,7 +621,7 @@ export default function AdminRoomsPage() {
                 </select>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => setShowRoomModal(false)}
@@ -666,8 +643,8 @@ export default function AdminRoomsPage() {
 
       {/* MODAL TAMBAH / EDIT TIPE KAMAR */}
       {showTypeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="my-auto w-full max-w-lg rounded-[20px] bg-[#FFFDFA] p-7 shadow-xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-3 sm:p-4">
+          <div className="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[20px] bg-[#FFFDFA] p-5 shadow-xl sm:p-7 md:max-h-none">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="font-heading text-2xl font-semibold text-[#192B35]">
@@ -703,12 +680,7 @@ export default function AdminRoomsPage() {
                   required
                   rows={3}
                   value={typeForm.description}
-                  onChange={(e) =>
-                    setTypeForm({
-                      ...typeForm,
-                      description: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
                   placeholder="Masukkan deskripsi kamar..."
                   className="w-full resize-none rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
@@ -733,12 +705,7 @@ export default function AdminRoomsPage() {
                   required
                   rows={2}
                   value={typeForm.facilities}
-                  onChange={(e) =>
-                    setTypeForm({
-                      ...typeForm,
-                      facilities: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setTypeForm({ ...typeForm, facilities: e.target.value })}
                   placeholder="Contoh: Wi-Fi, AC, TV, kamar mandi"
                   className="w-full resize-none rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
@@ -758,7 +725,7 @@ export default function AdminRoomsPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => setShowTypeModal(false)}

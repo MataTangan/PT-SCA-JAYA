@@ -132,7 +132,6 @@ export default function AdminUsersPage() {
         user.phone.includes(keyword);
 
       const matchesRole = filterRole === "Semua" || user.role === filterRole;
-
       const matchesStatus = filterStatus === "Semua" || user.status === filterStatus;
 
       return matchesSearch && matchesRole && matchesStatus;
@@ -237,23 +236,26 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] text-[#343A3D]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F5F0E8] text-[#343A3D]">
       <AdminSidebar />
 
-      <div className="ml-[210px] min-h-screen">
+      <div className="min-h-screen min-w-0 w-full md:ml-[210px] md:w-[calc(100%-210px)]">
         <AdminTopbar />
 
-        <main className="px-8 pb-16 pt-8">
+        {/* Ruang untuk Topbar fixed */}
+        <div className="h-[60px] md:h-[50px]" />
+
+        <main className="w-full min-w-0 px-4 pb-10 pt-6 sm:px-6 md:px-8 md:pb-16 md:pt-8">
           {/* Judul halaman */}
           <section className="mb-7">
-            <h1 className="font-heading text-3xl font-semibold text-[#192B35]">
+            <h1 className="font-heading text-2xl font-semibold text-[#192B35] sm:text-3xl">
               Manajemen Pengguna
             </h1>
             <p className="mt-1 text-[13px] text-gray-500">Akun, role, dan hak akses.</p>
           </section>
 
           {/* Ringkasan pengguna */}
-          <section className="mb-7 grid grid-cols-3 gap-4">
+          <section className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 label: "Total Pengguna",
@@ -283,7 +285,7 @@ export default function AdminUsersPage() {
           </section>
 
           {/* Tabel pengguna */}
-          <section className="rounded-[20px] border border-[#E2D8C8] bg-[#FFFDFA] p-6">
+          <section className="min-w-0 rounded-[20px] border border-[#E2D8C8] bg-[#FFFDFA] p-4 sm:p-5 md:p-6">
             <div className="mb-6">
               <h2 className="font-heading text-xl font-semibold text-[#192B35]">Daftar Pengguna</h2>
               <p className="mt-1 text-sm text-gray-500">
@@ -292,7 +294,7 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Pencarian dan filter */}
-            <div className="mb-6 flex flex-wrap items-center gap-3">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <input
                 type="text"
                 placeholder="Cari nama, email, atau nomor telepon..."
@@ -304,7 +306,7 @@ export default function AdminUsersPage() {
               <select
                 value={filterRole}
                 onChange={(e) => setFilterRole(e.target.value)}
-                className="h-8 rounded-lg border border-[#DED8CE] bg-white px-2 text-xs outline-none focus:border-[#C6A46A] sm:w-[115px]"
+                className="h-8 w-full rounded-lg border border-[#DED8CE] bg-white px-2 text-xs outline-none focus:border-[#C6A46A] sm:w-[115px]"
               >
                 <option value="Semua">Semua Role</option>
                 <option value="Admin">Admin</option>
@@ -316,7 +318,7 @@ export default function AdminUsersPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="h-8 rounded-lg border border-[#DED8CE] bg-white px-2 text-xs outline-none focus:border-[#C6A46A] sm:w-[115px]"
+                className="h-8 w-full rounded-lg border border-[#DED8CE] bg-white px-2 text-xs outline-none focus:border-[#C6A46A] sm:w-[115px]"
               >
                 <option value="Semua">Semua Status</option>
                 <option value="Aktif">Aktif</option>
@@ -325,7 +327,7 @@ export default function AdminUsersPage() {
 
               <button
                 onClick={openAddModal}
-                className="ml-auto h-8 rounded-lg bg-[#C6A46A] px-3 py-2.5 text-xs font-medium text-[#192B35] transition hover:bg-[#B8955D]"
+                className="h-8 w-full rounded-lg bg-[#C6A46A] px-3 py-2.5 text-xs font-medium text-[#192B35] transition hover:bg-[#B8955D] sm:ml-auto sm:w-auto"
               >
                 + Tambah Pengguna
               </button>
@@ -333,7 +335,7 @@ export default function AdminUsersPage() {
 
             {/* Tabel */}
             <div className="w-full overflow-x-auto">
-              <table className="w-full min-w-[750px] table-fixed text-left text-xs">
+              <table className="w-full min-w-[750px] table-fixed text-left text-xs md:min-w-0">
                 <thead className="border-b border-[#E2D8C8] text-[10px] uppercase text-gray-500">
                   <tr>
                     <th className="w-[6%] px-2 py-3 font-medium">No.</th>
@@ -400,8 +402,8 @@ export default function AdminUsersPage() {
 
       {/* Modal tambah dan edit pengguna */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="my-auto max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[20px] bg-[#FFFDFA] p-7 shadow-xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-3 sm:p-4">
+          <div className="my-auto max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[20px] bg-[#FFFDFA] p-5 shadow-xl sm:p-7">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="font-heading text-2xl font-semibold text-[#192B35]">
@@ -535,7 +537,7 @@ export default function AdminUsersPage() {
               </div>
 
               {/* Tombol */}
-              <div className="flex justify-end gap-3 pt-3">
+              <div className="flex flex-col-reverse justify-end gap-3 pt-3 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}

@@ -226,7 +226,6 @@ export default function AdminReportsPage() {
 
   const transactionSummary = useMemo(() => {
     const paid = filteredTransactions.filter((item) => item.payment === "Lunas");
-
     const unpaid = filteredTransactions.filter((item) => item.payment === "Belum bayar");
 
     return {
@@ -276,40 +275,44 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F5F0E8]">
       <AdminSidebar />
 
-      <div className="ml-[210px] min-h-screen">
+      <div className="min-h-screen min-w-0 w-full md:ml-[210px] md:w-[calc(100%-210px)]">
         <AdminTopbar />
-        <main className="px-6 pt-6 pb-6 lg:px-8">
-          <div className="rounded-2xl border border-[#E8DED0] bg-[#FFFDFA] px-5 pt-3 pb-5 lg:px-7">
+
+        {/* Ruang untuk Topbar fixed */}
+        <div className="h-[60px] md:h-[50px]" />
+
+        <main className="w-full min-w-0 px-4 pb-6 pt-5 sm:px-6 md:px-6 md:pt-6 lg:px-8">
+          <div className="min-w-0 rounded-2xl border border-[#E8DED0] bg-[#FFFDFA] px-3 pb-5 pt-3 sm:px-5 lg:px-7">
             {/* Filter Periode */}
-            <div className="mb-4 flex flex-wrap items-end gap-3">
-              <div className="flex flex-col gap-1">
+            <div className="mb-4 grid grid-cols-1 items-end gap-3 sm:flex sm:flex-wrap">
+              <div className="flex min-w-0 flex-col gap-1">
                 <label className="text-[12px] font-medium text-gray-600">Dari</label>
                 <input
                   type="date"
                   value={startDate}
                   max={endDate || undefined}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="h-8 w-[145px] rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[14px] text-[#192B35] outline-none focus:border-[#C6A46A]"
+                  className="h-9 w-full rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[14px] text-[#192B35] outline-none focus:border-[#C6A46A] sm:h-8 sm:w-[145px]"
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
+              <div className="flex min-w-0 flex-col gap-1">
                 <label className="text-[12px] font-medium text-gray-600">Sampai</label>
                 <input
                   type="date"
                   value={endDate}
                   min={startDate || undefined}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="h-8 w-[145px] rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[14px] text-[#192B35] outline-none focus:border-[#C6A46A]"
+                  className="h-9 w-full rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[14px] text-[#192B35] outline-none focus:border-[#C6A46A] sm:h-8 sm:w-[145px]"
                 />
               </div>
 
               <button
                 onClick={applyDateFilter}
-                className="h-8 rounded-xl bg-[#C6A46A] px-5 text-[14px] font-semibold text-[#192B35] transition hover:bg-[#B8955D]"
+                className="h-9 w-full rounded-xl bg-[#C6A46A] px-5 text-[14px] font-semibold text-[#192B35] transition hover:bg-[#B8955D] sm:h-8 sm:w-auto"
               >
                 Terapkan
               </button>
@@ -318,10 +321,10 @@ export default function AdminReportsPage() {
             {dateError && <p className="mb-4 text-xs text-red-600">{dateError}</p>}
 
             {/* Tab Laporan */}
-            <div className="mb-5 flex flex-wrap gap-2">
+            <div className="mb-5 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               <button
                 onClick={() => setActiveTab("occupancy")}
-                className={`rounded-xl border px-5 py-3 text-sm font-semibold transition ${
+                className={`rounded-xl border px-4 py-3 text-sm font-semibold transition sm:px-5 ${
                   activeTab === "occupancy"
                     ? "border-[#192B35] bg-[#192B35] text-white"
                     : "border-[#E5D9C8] bg-white text-[#192B35] hover:bg-[#F7F3EC]"
@@ -332,7 +335,7 @@ export default function AdminReportsPage() {
 
               <button
                 onClick={() => setActiveTab("transactions")}
-                className={`rounded-xl border px-5 py-3 text-sm font-semibold transition ${
+                className={`rounded-xl border px-4 py-3 text-sm font-semibold transition sm:px-5 ${
                   activeTab === "transactions"
                     ? "border-[#192B35] bg-[#192B35] text-white"
                     : "border-[#E5D9C8] bg-white text-[#192B35] hover:bg-[#F7F3EC]"
@@ -346,18 +349,18 @@ export default function AdminReportsPage() {
             {activeTab === "occupancy" && (
               <>
                 {/* Ringkasan Okupansi */}
-                <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#C6A46A] bg-white p-5">
+                <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
+                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#C6A46A] bg-white p-4 sm:p-5">
                     <p className="text-3xl font-semibold text-[#192B35]">{averageOccupancy}%</p>
                     <p className="mt-1 text-sm text-gray-500">Rata-rata keterisian</p>
                   </div>
 
-                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#A5B1A0] bg-white p-5">
+                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#A5B1A0] bg-white p-4 sm:p-5">
                     <p className="text-3xl font-semibold text-[#192B35]">{dateRange.length}</p>
                     <p className="mt-1 text-sm text-gray-500">Hari dalam periode</p>
                   </div>
 
-                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#192B35] bg-white p-5">
+                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#192B35] bg-white p-4 sm:col-span-2 sm:p-5 md:col-span-1">
                     <p className="text-3xl font-semibold text-[#192B35]">{ACTIVE_ROOMS}</p>
                     <p className="mt-1 text-sm text-gray-500">Kamar aktif</p>
                   </div>
@@ -370,13 +373,13 @@ export default function AdminReportsPage() {
                     placeholder="Cari tanggal..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="h-8 w-full max-w-[280px] rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] outline-none focus:border-[#C6A46A]"
+                    className="h-9 w-full max-w-none rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] outline-none focus:border-[#C6A46A] sm:h-8 sm:max-w-[280px]"
                   />
                 </div>
 
                 {/* Tabel Okupansi */}
                 <div className="w-full overflow-x-auto">
-                  <table className="w-full min-w-[650px] table-fixed text-left text-xs">
+                  <table className="w-full min-w-[650px] table-fixed text-left text-xs md:min-w-0">
                     <thead className="border-b border-[#E5D9C8] text-xs uppercase text-gray-500">
                       <tr>
                         <th className="w-[24%] px-3 py-4 font-medium">Tanggal</th>
@@ -417,23 +420,23 @@ export default function AdminReportsPage() {
             {activeTab === "transactions" && (
               <>
                 {/* Ringkasan Transaksi */}
-                <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#C6A46A] bg-white p-5">
+                <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
+                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#C6A46A] bg-white p-4 sm:p-5">
                     <p className="text-3xl font-semibold text-[#192B35]">
                       {transactionSummary.total}
                     </p>
                     <p className="mt-1 text-sm text-gray-500">Transaksi</p>
                   </div>
 
-                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#A5B1A0] bg-white p-5">
-                    <p className="text-2xl font-semibold text-[#192B35]">
+                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#A5B1A0] bg-white p-4 sm:p-5">
+                    <p className="break-words text-2xl font-semibold text-[#192B35]">
                       {formatRupiah(transactionSummary.paid)}
                     </p>
                     <p className="mt-1 text-sm text-gray-500">Lunas</p>
                   </div>
 
-                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#192B35] bg-white p-5">
-                    <p className="text-2xl font-semibold text-[#192B35]">
+                  <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#192B35] bg-white p-4 sm:col-span-2 sm:p-5 md:col-span-1">
+                    <p className="break-words text-2xl font-semibold text-[#192B35]">
                       {formatRupiah(transactionSummary.unpaid)}
                     </p>
                     <p className="mt-1 text-sm text-gray-500">Belum dibayar</p>
@@ -441,19 +444,19 @@ export default function AdminReportsPage() {
                 </div>
 
                 {/* Pencarian dan Filter Status */}
-                <div className="mb-4 flex flex-wrap items-center gap-3">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                   <input
                     type="text"
                     placeholder="Cari..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="h-8 w-full max-w-[280px] rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] outline-none focus:border-[#C6A46A]"
+                    className="h-9 w-full rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] outline-none focus:border-[#C6A46A] sm:h-8 sm:w-[280px]"
                   />
 
                   <select
                     value={paymentFilter}
                     onChange={(e) => setPaymentFilter(e.target.value)}
-                    className="h-8 rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] text-[#192B35] outline-none focus:border-[#C6A46A]"
+                    className="h-9 w-full rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] text-[#192B35] outline-none focus:border-[#C6A46A] sm:h-8 sm:w-auto"
                   >
                     <option>Semua status</option>
                     <option>Lunas</option>
@@ -463,7 +466,7 @@ export default function AdminReportsPage() {
 
                 {/* Tabel Transaksi */}
                 <div className="w-full overflow-x-auto">
-                  <table className="w-full min-w-[900px] table-fixed text-left text-xs">
+                  <table className="w-full min-w-[900px] table-fixed text-left text-xs md:min-w-0">
                     <thead className="border-b border-[#E5D9C8] text-xs uppercase text-gray-500">
                       <tr>
                         <th className="w-[8%] px-3 py-4 font-medium">ID</th>
