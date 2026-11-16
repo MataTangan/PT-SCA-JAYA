@@ -8,6 +8,9 @@
     "node": ">=20"
   },
   "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "install:frontend": "npm --prefix frontend install",
+    "build:frontend": "npm --prefix frontend run build",
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint .",
