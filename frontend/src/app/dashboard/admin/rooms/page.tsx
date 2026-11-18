@@ -5,7 +5,7 @@ import type { FormEvent } from "react";
 import AdminSidebar from "@/components/admin/Sidebar";
 import AdminTopbar from "@/components/admin/Topbar";
 
-type RoomStatus = "Tersedia" | "Terisi" | "Dipesan" | "Perawatan";
+type RoomStatus = "Available" | "Occupied" | "Reserved" | "Maintenance";
 type ActiveTab = "unit" | "type";
 
 type Room = {
@@ -26,51 +26,51 @@ type RoomType = {
 };
 
 const initialRooms: Room[] = [
-  { id: 1, number: "S-101", type: "Superior", floor: "1", status: "Tersedia" },
-  { id: 2, number: "S-102", type: "Superior", floor: "1", status: "Terisi" },
-  { id: 3, number: "S-103", type: "Superior", floor: "1", status: "Tersedia" },
-  { id: 4, number: "S-104", type: "Superior", floor: "1", status: "Perawatan" },
-  { id: 5, number: "S-105", type: "Superior", floor: "1", status: "Dipesan" },
-  { id: 6, number: "D-201", type: "Deluxe", floor: "2", status: "Terisi" },
-  { id: 7, number: "D-202", type: "Deluxe", floor: "2", status: "Tersedia" },
-  { id: 8, number: "D-203", type: "Deluxe", floor: "2", status: "Tersedia" },
-  { id: 9, number: "D-204", type: "Deluxe", floor: "2", status: "Dipesan" },
-  { id: 10, number: "SU-301", type: "Suite", floor: "3", status: "Terisi" },
-  { id: 11, number: "SU-302", type: "Suite", floor: "3", status: "Tersedia" },
+  { id: 1, number: "S-101", type: "Superior", floor: "1", status: "Available" },
+  { id: 2, number: "S-102", type: "Superior", floor: "1", status: "Occupied" },
+  { id: 3, number: "S-103", type: "Superior", floor: "1", status: "Available" },
+  { id: 4, number: "S-104", type: "Superior", floor: "1", status: "Maintenance" },
+  { id: 5, number: "S-105", type: "Superior", floor: "1", status: "Reserved" },
+  { id: 6, number: "D-201", type: "Deluxe", floor: "2", status: "Occupied" },
+  { id: 7, number: "D-202", type: "Deluxe", floor: "2", status: "Available" },
+  { id: 8, number: "D-203", type: "Deluxe", floor: "2", status: "Available" },
+  { id: 9, number: "D-204", type: "Deluxe", floor: "2", status: "Reserved" },
+  { id: 10, number: "SU-301", type: "Suite", floor: "3", status: "Occupied" },
+  { id: 11, number: "SU-302", type: "Suite", floor: "3", status: "Available" },
 ];
 
 const initialRoomTypes: RoomType[] = [
   {
     id: 1,
     name: "Superior",
-    description: "Kamar nyaman untuk kebutuhan menginap sehari-hari.",
+    description: "A comfortable room for everyday stays.",
     capacity: 2,
-    facilities: "Wi-Fi, AC, TV, kamar mandi",
+    facilities: "Wi-Fi, AC, TV, bathroom",
     price: 450000,
   },
   {
     id: 2,
     name: "Deluxe",
-    description: "Kamar dengan ruang lebih luas dan fasilitas tambahan.",
+    description: "A more spacious room with additional facilities.",
     capacity: 2,
-    facilities: "Wi-Fi, AC, TV, meja kerja, kamar mandi",
+    facilities: "Wi-Fi, AC, TV, work desk, bathroom",
     price: 650000,
   },
   {
     id: 3,
     name: "Suite",
-    description: "Kamar dengan ruang lebih luas untuk pengalaman menginap.",
+    description: "A spacious room for a more comfortable stay.",
     capacity: 3,
-    facilities: "Wi-Fi, AC, TV, ruang duduk, kamar mandi",
+    facilities: "Wi-Fi, AC, TV, sitting area, bathroom",
     price: 950000,
   },
 ];
 
 const statusStyles: Record<RoomStatus, string> = {
-  Tersedia: "bg-[#E7EEE5] text-[#587052]",
-  Terisi: "bg-[#E5E9EC] text-[#192B35]",
-  Dipesan: "bg-[#F4EBD9] text-[#9A763D]",
-  Perawatan: "bg-[#F3E2DF] text-[#A15F55]",
+  Available: "bg-[#E7EEE5] text-[#587052]",
+  Occupied: "bg-[#E5E9EC] text-[#192B35]",
+  Reserved: "bg-[#F4EBD9] text-[#9A763D]",
+  Maintenance: "bg-[#F3E2DF] text-[#A15F55]",
 };
 
 const formatRupiah = (value: number) =>
@@ -86,7 +86,7 @@ export default function AdminRoomsPage() {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>("unit");
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Semua");
+  const [filterStatus, setFilterStatus] = useState("All");
 
   const [showRoomModal, setShowRoomModal] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
@@ -95,7 +95,7 @@ export default function AdminRoomsPage() {
     number: "",
     type: "Superior",
     floor: "1",
-    status: "Tersedia" as RoomStatus,
+    status: "Available" as RoomStatus,
   });
 
   const [showTypeModal, setShowTypeModal] = useState(false);
@@ -109,7 +109,7 @@ export default function AdminRoomsPage() {
     price: "",
   });
 
-  // Pencarian unit kamar
+  // Room unit search
   const filteredRooms = useMemo(() => {
     return rooms.filter((room) => {
       const keyword = search.toLowerCase();
@@ -117,13 +117,13 @@ export default function AdminRoomsPage() {
       const matchesSearch =
         room.number.toLowerCase().includes(keyword) || room.type.toLowerCase().includes(keyword);
 
-      const matchesStatus = filterStatus === "Semua" || room.status === filterStatus;
+      const matchesStatus = filterStatus === "All" || room.status === filterStatus;
 
       return matchesSearch && matchesStatus;
     });
   }, [rooms, search, filterStatus]);
 
-  // Pencarian tipe kamar
+  // Room type search
   const filteredTypes = useMemo(() => {
     const keyword = search.toLowerCase();
 
@@ -134,25 +134,25 @@ export default function AdminRoomsPage() {
     );
   }, [roomTypes, search]);
 
-  // Ringkasan kamar
+  // Room summary
   const totalRooms = rooms.length;
-  const availableRooms = rooms.filter((room) => room.status === "Tersedia").length;
-  const occupiedRooms = rooms.filter((room) => room.status === "Terisi").length;
-  const maintenanceRooms = rooms.filter((room) => room.status === "Perawatan").length;
+  const availableRooms = rooms.filter((room) => room.status === "Available").length;
+  const occupiedRooms = rooms.filter((room) => room.status === "Occupied").length;
+  const maintenanceRooms = rooms.filter((room) => room.status === "Maintenance").length;
 
-  // Tambah unit kamar
+  // Add room unit
   function openAddRoom() {
     setEditingRoom(null);
     setRoomForm({
       number: "",
       type: roomTypes[0]?.name || "",
       floor: "1",
-      status: "Tersedia",
+      status: "Available",
     });
     setShowRoomModal(true);
   }
 
-  // Edit unit kamar
+  // Edit room unit
   function openEditRoom(room: Room) {
     setEditingRoom(room);
     setRoomForm({
@@ -164,14 +164,14 @@ export default function AdminRoomsPage() {
     setShowRoomModal(true);
   }
 
-  // Simpan unit kamar
+  // Save room unit
   function handleRoomSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const roomNumber = roomForm.number.trim();
 
     if (!roomNumber) {
-      alert("Nomor kamar harus diisi.");
+      alert("Room number is required.");
       return;
     }
 
@@ -181,7 +181,7 @@ export default function AdminRoomsPage() {
     );
 
     if (duplicate) {
-      alert("Nomor kamar sudah digunakan.");
+      alert("This room number is already in use.");
       return;
     }
 
@@ -205,7 +205,7 @@ export default function AdminRoomsPage() {
     setShowRoomModal(false);
   }
 
-  // Tambah tipe kamar
+  // Add room type
   function openAddType() {
     setEditingType(null);
     setTypeForm({
@@ -218,7 +218,7 @@ export default function AdminRoomsPage() {
     setShowTypeModal(true);
   }
 
-  // Edit tipe kamar
+  // Edit room type
   function openEditType(type: RoomType) {
     setEditingType(type);
     setTypeForm({
@@ -231,7 +231,7 @@ export default function AdminRoomsPage() {
     setShowTypeModal(true);
   }
 
-  // Simpan tipe kamar
+  // Save room type
   function handleTypeSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -240,17 +240,17 @@ export default function AdminRoomsPage() {
     const capacity = Number(typeForm.capacity);
 
     if (!name || !typeForm.description.trim() || !typeForm.facilities.trim()) {
-      alert("Semua informasi tipe kamar harus diisi.");
+      alert("All room type information is required.");
       return;
     }
 
     if (!Number.isInteger(price) || price <= 0) {
-      alert("Tarif kamar harus berupa angka lebih dari 0.");
+      alert("Room rate must be a number greater than 0.");
       return;
     }
 
     if (!Number.isInteger(capacity) || capacity < 1) {
-      alert("Kapasitas kamar minimal 1 orang.");
+      alert("Room capacity must be at least 1 person.");
       return;
     }
 
@@ -259,7 +259,7 @@ export default function AdminRoomsPage() {
     );
 
     if (duplicate) {
-      alert("Nama tipe kamar sudah digunakan.");
+      alert("This room type name is already in use.");
       return;
     }
 
@@ -311,23 +311,23 @@ export default function AdminRoomsPage() {
         <AdminTopbar />
 
         <main className="w-full min-w-0 px-4 pb-10 pt-[84px] sm:px-6 md:px-8 md:pb-16 md:pt-[74px]">
-          {/* Judul halaman */}
+          {/* Page Title */}
           <section className="mb-7">
             <h1 className="font-heading text-2xl font-semibold text-[#192B35] sm:text-3xl">
-              Manajemen Kamar
+              Room Management
             </h1>
             <p className="mt-1 text-[13px] text-gray-500">
-              Tipe, unit, fasilitas, status, dan tarif.
+              Room types, units, facilities, status, and rates.
             </p>
           </section>
 
-          {/* Ringkasan kamar */}
+          {/* Room Summary */}
           <section className="mb-7 grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
-              { label: "Total Unit Kamar", value: totalRooms, color: "#C6A46A" },
-              { label: "Kamar Tersedia", value: availableRooms, color: "#A5B1A0" },
-              { label: "Kamar Terisi", value: occupiedRooms, color: "#192B35" },
-              { label: "Dalam Perawatan", value: maintenanceRooms, color: "#C58A80" },
+              { label: "Total Room Units", value: totalRooms, color: "#C6A46A" },
+              { label: "Available Rooms", value: availableRooms, color: "#A5B1A0" },
+              { label: "Occupied Rooms", value: occupiedRooms, color: "#192B35" },
+              { label: "Under Maintenance", value: maintenanceRooms, color: "#C58A80" },
             ].map((item) => (
               <div
                 key={item.label}
@@ -340,9 +340,9 @@ export default function AdminRoomsPage() {
             ))}
           </section>
 
-          {/* Panel utama dengan dua tab */}
+          {/* Main Panel with Two Tabs */}
           <section className="min-w-0 rounded-[20px] border border-[#E2D8C8] bg-[#FFFDFA] p-4 sm:p-5 md:p-6">
-            {/* Tab */}
+            {/* Tabs */}
             <div className="mb-6 flex flex-wrap gap-2">
               <button
                 onClick={() => {
@@ -355,7 +355,7 @@ export default function AdminRoomsPage() {
                     : "border-[#E2D8C8] bg-[#FFFDFA] text-[#192B35] hover:bg-[#F5F0E8]"
                 }`}
               >
-                Tipe & Tarif
+                Room Types & Rates
               </button>
 
               <button
@@ -369,16 +369,16 @@ export default function AdminRoomsPage() {
                     : "border-[#E2D8C8] bg-[#FFFDFA] text-[#192B35] hover:bg-[#F5F0E8]"
                 }`}
               >
-                Unit Kamar
+                Room Units
               </button>
             </div>
 
-            {/* Pencarian, filter, dan tombol tambah */}
+            {/* Search, Filter, and Add Button */}
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <input
                 type="text"
                 placeholder={
-                  activeTab === "unit" ? "Cari nomor atau tipe kamar..." : "Cari tipe kamar..."
+                  activeTab === "unit" ? "Search room number or type..." : "Search room type..."
                 }
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -391,11 +391,11 @@ export default function AdminRoomsPage() {
                   onChange={(e) => setFilterStatus(e.target.value)}
                   className="w-full rounded-lg border border-[#DED8CE] bg-white px-3 py-2 text-xs outline-none focus:border-[#C6A46A] sm:w-auto"
                 >
-                  <option value="Semua">Semua Status</option>
-                  <option value="Tersedia">Tersedia</option>
-                  <option value="Terisi">Terisi</option>
-                  <option value="Dipesan">Dipesan</option>
-                  <option value="Perawatan">Perawatan</option>
+                  <option value="All">All Statuses</option>
+                  <option value="Available">Available</option>
+                  <option value="Occupied">Occupied</option>
+                  <option value="Reserved">Reserved</option>
+                  <option value="Maintenance">Maintenance</option>
                 </select>
               )}
 
@@ -404,11 +404,11 @@ export default function AdminRoomsPage() {
                 disabled={activeTab === "unit" && roomTypes.length === 0}
                 className="w-full rounded-lg bg-[#C6A46A] px-4 py-2 text-xs font-medium text-[#192B35] transition hover:bg-[#B8955D] disabled:cursor-not-allowed disabled:opacity-50 sm:ml-auto sm:w-auto"
               >
-                {activeTab === "unit" ? "+ Unit Kamar" : "+ Tipe Kamar"}
+                {activeTab === "unit" ? "+ Add Room Unit" : "+ Add Room Type"}
               </button>
             </div>
 
-            {/* TAB UNIT KAMAR */}
+            {/* ROOM UNITS TAB */}
             {activeTab === "unit" && (
               <>
                 <div className="w-full overflow-x-auto">
@@ -416,11 +416,11 @@ export default function AdminRoomsPage() {
                     <thead className="border-b border-[#E2D8C8] text-[11px] uppercase text-gray-500">
                       <tr>
                         <th className="w-[6%] px-2 py-3 font-medium">No.</th>
-                        <th className="w-[20%] px-2 py-3 font-medium">Kamar</th>
-                        <th className="w-[22%] px-2 py-3 font-medium">Tipe</th>
-                        <th className="w-[18%] px-2 py-3 font-medium">Lantai</th>
+                        <th className="w-[20%] px-2 py-3 font-medium">Room</th>
+                        <th className="w-[22%] px-2 py-3 font-medium">Type</th>
+                        <th className="w-[18%] px-2 py-3 font-medium">Floor</th>
                         <th className="w-[22%] px-2 py-3 font-medium">Status</th>
-                        <th className="w-[12%] px-2 py-3 text-center font-medium">Aksi</th>
+                        <th className="w-[12%] px-2 py-3 text-center font-medium">Actions</th>
                       </tr>
                     </thead>
 
@@ -436,7 +436,7 @@ export default function AdminRoomsPage() {
                               {room.number}
                             </td>
                             <td className="break-words px-2 py-3">{room.type}</td>
-                            <td className="px-2 py-3">Lantai {room.floor}</td>
+                            <td className="px-2 py-3">Floor {room.floor}</td>
                             <td className="px-2 py-3">
                               <span
                                 className={`inline-block rounded-full px-2 py-1 text-[10px] font-medium ${statusStyles[room.status]}`}
@@ -449,7 +449,7 @@ export default function AdminRoomsPage() {
                                 onClick={() => openEditRoom(room)}
                                 className="font-medium text-[#9A763D] hover:underline"
                               >
-                                Ubah
+                                Edit
                               </button>
                             </td>
                           </tr>
@@ -457,7 +457,7 @@ export default function AdminRoomsPage() {
                       ) : (
                         <tr>
                           <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
-                            Unit kamar tidak ditemukan.
+                            No room units found.
                           </td>
                         </tr>
                       )}
@@ -466,12 +466,12 @@ export default function AdminRoomsPage() {
                 </div>
 
                 <p className="mt-4 text-xs text-gray-400">
-                  Menampilkan {filteredRooms.length} dari {totalRooms} unit kamar.
+                  Showing {filteredRooms.length} of {totalRooms} room units.
                 </p>
               </>
             )}
 
-            {/* TAB TIPE DAN TARIF */}
+            {/* ROOM TYPES AND RATES TAB */}
             {activeTab === "type" && (
               <>
                 <div className="w-full overflow-x-auto">
@@ -479,12 +479,12 @@ export default function AdminRoomsPage() {
                     <thead className="border-b border-[#E2D8C8] text-[10px] uppercase text-gray-500">
                       <tr>
                         <th className="w-[5%] px-2 py-3 font-medium">No.</th>
-                        <th className="w-[14%] px-2 py-3 font-medium">Tipe Kamar</th>
-                        <th className="w-[22%] px-2 py-3 font-medium">Deskripsi</th>
-                        <th className="w-[10%] px-2 py-3 font-medium">Kapasitas</th>
-                        <th className="w-[21%] px-2 py-3 font-medium">Fasilitas</th>
-                        <th className="w-[17%] px-2 py-3 font-medium">Tarif / Malam</th>
-                        <th className="w-[11%] px-2 py-3 text-center font-medium">Aksi</th>
+                        <th className="w-[14%] px-2 py-3 font-medium">Room Type</th>
+                        <th className="w-[22%] px-2 py-3 font-medium">Description</th>
+                        <th className="w-[10%] px-2 py-3 font-medium">Capacity</th>
+                        <th className="w-[21%] px-2 py-3 font-medium">Facilities</th>
+                        <th className="w-[17%] px-2 py-3 font-medium">Rate / Night</th>
+                        <th className="w-[11%] px-2 py-3 text-center font-medium">Actions</th>
                       </tr>
                     </thead>
 
@@ -502,7 +502,7 @@ export default function AdminRoomsPage() {
                             <td className="break-words px-2 py-3 leading-5 text-gray-500">
                               {type.description}
                             </td>
-                            <td className="px-2 py-3">{type.capacity} orang</td>
+                            <td className="px-2 py-3">{type.capacity} guests</td>
                             <td className="break-words px-2 py-3 leading-5">{type.facilities}</td>
                             <td className="break-words px-2 py-3 font-medium text-[#192B35]">
                               {formatRupiah(type.price)}
@@ -512,7 +512,7 @@ export default function AdminRoomsPage() {
                                 onClick={() => openEditType(type)}
                                 className="font-medium text-[#9A763D] hover:underline"
                               >
-                                Ubah
+                                Edit
                               </button>
                             </td>
                           </tr>
@@ -520,7 +520,7 @@ export default function AdminRoomsPage() {
                       ) : (
                         <tr>
                           <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
-                            Tipe kamar tidak ditemukan.
+                            No room types found.
                           </td>
                         </tr>
                       )}
@@ -529,7 +529,7 @@ export default function AdminRoomsPage() {
                 </div>
 
                 <p className="mt-4 text-xs text-gray-400">
-                  Menampilkan {filteredTypes.length} dari {roomTypes.length} tipe kamar.
+                  Showing {filteredTypes.length} of {roomTypes.length} room types.
                 </p>
               </>
             )}
@@ -537,22 +537,22 @@ export default function AdminRoomsPage() {
         </main>
       </div>
 
-      {/* MODAL TAMBAH / EDIT UNIT KAMAR */}
+      {/* ADD / EDIT ROOM UNIT MODAL */}
       {showRoomModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-3 sm:p-4">
           <div className="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[20px] bg-[#FFFDFA] p-5 shadow-xl sm:p-7 md:max-h-none">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="font-heading text-2xl font-semibold text-[#192B35]">
-                  {editingRoom ? "Ubah Unit Kamar" : "Tambah Unit Kamar"}
+                  {editingRoom ? "Edit Room Unit" : "Add Room Unit"}
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">Lengkapi informasi unit kamar.</p>
+                <p className="mt-1 text-sm text-gray-500">Complete the room unit information.</p>
               </div>
 
               <button
                 onClick={() => setShowRoomModal(false)}
                 className="text-2xl text-gray-400 hover:text-gray-700"
-                aria-label="Tutup"
+                aria-label="Close"
               >
                 ×
               </button>
@@ -560,19 +560,19 @@ export default function AdminRoomsPage() {
 
             <form onSubmit={handleRoomSubmit} className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium">Nomor Kamar</label>
+                <label className="mb-2 block text-sm font-medium">Room Number</label>
                 <input
                   required
                   value={roomForm.number}
                   onChange={(e) => setRoomForm({ ...roomForm, number: e.target.value })}
-                  placeholder="Contoh: S-106"
+                  placeholder="Example: S-106"
                   className="w-full rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Tipe Kamar</label>
+                  <label className="mb-2 block text-sm font-medium">Room Type</label>
                   <select
                     required
                     value={roomForm.type}
@@ -588,22 +588,22 @@ export default function AdminRoomsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Lantai</label>
+                  <label className="mb-2 block text-sm font-medium">Floor</label>
                   <select
                     value={roomForm.floor}
                     onChange={(e) => setRoomForm({ ...roomForm, floor: e.target.value })}
                     className="w-full rounded-lg border border-[#DED8CE] bg-white px-3 py-3 text-sm outline-none focus:border-[#C6A46A]"
                   >
-                    <option value="1">Lantai 1</option>
-                    <option value="2">Lantai 2</option>
-                    <option value="3">Lantai 3</option>
-                    <option value="4">Lantai 4</option>
+                    <option value="1">Floor 1</option>
+                    <option value="2">Floor 2</option>
+                    <option value="3">Floor 3</option>
+                    <option value="4">Floor 4</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium">Status Kamar</label>
+                <label className="mb-2 block text-sm font-medium">Room Status</label>
                 <select
                   value={roomForm.status}
                   onChange={(e) =>
@@ -614,10 +614,10 @@ export default function AdminRoomsPage() {
                   }
                   className="w-full rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 >
-                  <option value="Tersedia">Tersedia</option>
-                  <option value="Terisi">Terisi</option>
-                  <option value="Dipesan">Dipesan</option>
-                  <option value="Perawatan">Perawatan</option>
+                  <option value="Available">Available</option>
+                  <option value="Occupied">Occupied</option>
+                  <option value="Reserved">Reserved</option>
+                  <option value="Maintenance">Maintenance</option>
                 </select>
               </div>
 
@@ -627,13 +627,13 @@ export default function AdminRoomsPage() {
                   onClick={() => setShowRoomModal(false)}
                   className="rounded-lg border border-[#DED8CE] px-5 py-3 text-sm text-gray-600 hover:bg-[#F5F0E8]"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="rounded-lg bg-[#192B35] px-5 py-3 text-sm font-medium text-white hover:bg-[#304650]"
                 >
-                  {editingRoom ? "Simpan Perubahan" : "Tambah Kamar"}
+                  {editingRoom ? "Save Changes" : "Add Room"}
                 </button>
               </div>
             </form>
@@ -641,22 +641,24 @@ export default function AdminRoomsPage() {
         </div>
       )}
 
-      {/* MODAL TAMBAH / EDIT TIPE KAMAR */}
+      {/* ADD / EDIT ROOM TYPE MODAL */}
       {showTypeModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-3 sm:p-4">
           <div className="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[20px] bg-[#FFFDFA] p-5 shadow-xl sm:p-7 md:max-h-none">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="font-heading text-2xl font-semibold text-[#192B35]">
-                  {editingType ? "Ubah Tipe Kamar" : "Tambah Tipe Kamar"}
+                  {editingType ? "Edit Room Type" : "Add Room Type"}
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">Lengkapi detail dan tarif tipe kamar.</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Complete the room type details and rates.
+                </p>
               </div>
 
               <button
                 onClick={() => setShowTypeModal(false)}
                 className="text-2xl text-gray-400 hover:text-gray-700"
-                aria-label="Tutup"
+                aria-label="Close"
               >
                 ×
               </button>
@@ -664,30 +666,30 @@ export default function AdminRoomsPage() {
 
             <form onSubmit={handleTypeSubmit} className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium">Nama Tipe Kamar</label>
+                <label className="mb-2 block text-sm font-medium">Room Type Name</label>
                 <input
                   required
                   value={typeForm.name}
                   onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
-                  placeholder="Contoh: Executive"
+                  placeholder="Example: Executive"
                   className="w-full rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium">Deskripsi Kamar</label>
+                <label className="mb-2 block text-sm font-medium">Room Description</label>
                 <textarea
                   required
                   rows={3}
                   value={typeForm.description}
                   onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
-                  placeholder="Masukkan deskripsi kamar..."
+                  placeholder="Enter room description..."
                   className="w-full resize-none rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium">Kapasitas (orang)</label>
+                <label className="mb-2 block text-sm font-medium">Capacity (guests)</label>
                 <input
                   required
                   type="number"
@@ -700,19 +702,19 @@ export default function AdminRoomsPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium">Fasilitas Kamar</label>
+                <label className="mb-2 block text-sm font-medium">Room Facilities</label>
                 <textarea
                   required
                   rows={2}
                   value={typeForm.facilities}
                   onChange={(e) => setTypeForm({ ...typeForm, facilities: e.target.value })}
-                  placeholder="Contoh: Wi-Fi, AC, TV, kamar mandi"
+                  placeholder="Example: Wi-Fi, AC, TV, bathroom"
                   className="w-full resize-none rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium">Tarif per Malam (Rp)</label>
+                <label className="mb-2 block text-sm font-medium">Rate per Night (IDR)</label>
                 <input
                   required
                   type="number"
@@ -720,7 +722,7 @@ export default function AdminRoomsPage() {
                   step="1"
                   value={typeForm.price}
                   onChange={(e) => setTypeForm({ ...typeForm, price: e.target.value })}
-                  placeholder="Contoh: 450000"
+                  placeholder="Example: 450000"
                   className="w-full rounded-lg border border-[#DED8CE] bg-white px-4 py-3 text-sm outline-none focus:border-[#C6A46A]"
                 />
               </div>
@@ -731,13 +733,13 @@ export default function AdminRoomsPage() {
                   onClick={() => setShowTypeModal(false)}
                   className="rounded-lg border border-[#DED8CE] px-5 py-3 text-sm text-gray-600 hover:bg-[#F5F0E8]"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="rounded-lg bg-[#192B35] px-5 py-3 text-sm font-medium text-white hover:bg-[#304650]"
                 >
-                  {editingType ? "Simpan Perubahan" : "Tambah Tipe"}
+                  {editingType ? "Save Changes" : "Add Room Type"}
                 </button>
               </div>
             </form>

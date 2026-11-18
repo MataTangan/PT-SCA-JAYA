@@ -5,7 +5,7 @@ import AdminSidebar from "@/components/admin/Sidebar";
 import AdminTopbar from "@/components/admin/Topbar";
 
 type Tab = "occupancy" | "transactions";
-type PaymentStatus = "Lunas" | "Belum bayar";
+type PaymentStatus = "Paid" | "Unpaid";
 
 type Transaction = {
   id: string;
@@ -27,8 +27,8 @@ const transactions: Transaction[] = [
     type: "Deluxe",
     checkIn: "2026-11-11",
     checkOut: "2026-11-14",
-    status: "Check-in",
-    payment: "Lunas",
+    status: "Checked In",
+    payment: "Paid",
     total: 2250000,
   },
   {
@@ -37,8 +37,8 @@ const transactions: Transaction[] = [
     type: "Superior",
     checkIn: "2026-11-13",
     checkOut: "2026-11-15",
-    status: "Dipesan",
-    payment: "Belum bayar",
+    status: "Reserved",
+    payment: "Unpaid",
     total: 900000,
   },
   {
@@ -47,8 +47,8 @@ const transactions: Transaction[] = [
     type: "Deluxe",
     checkIn: "2026-11-03",
     checkOut: "2026-11-05",
-    status: "Selesai",
-    payment: "Lunas",
+    status: "Completed",
+    payment: "Paid",
     total: 1500000,
   },
   {
@@ -57,8 +57,8 @@ const transactions: Transaction[] = [
     type: "Superior",
     checkIn: "2026-11-12",
     checkOut: "2026-11-14",
-    status: "Check-in",
-    payment: "Belum bayar",
+    status: "Checked In",
+    payment: "Unpaid",
     total: 900000,
   },
   {
@@ -67,8 +67,8 @@ const transactions: Transaction[] = [
     type: "Suite",
     checkIn: "2026-11-06",
     checkOut: "2026-11-08",
-    status: "Selesai",
-    payment: "Lunas",
+    status: "Completed",
+    payment: "Paid",
     total: 1900000,
   },
   {
@@ -77,8 +77,8 @@ const transactions: Transaction[] = [
     type: "Deluxe",
     checkIn: "2026-11-08",
     checkOut: "2026-11-10",
-    status: "Selesai",
-    payment: "Lunas",
+    status: "Completed",
+    payment: "Paid",
     total: 1200000,
   },
   {
@@ -87,8 +87,8 @@ const transactions: Transaction[] = [
     type: "Superior",
     checkIn: "2026-11-09",
     checkOut: "2026-11-11",
-    status: "Selesai",
-    payment: "Lunas",
+    status: "Completed",
+    payment: "Paid",
     total: 900000,
   },
   {
@@ -97,8 +97,8 @@ const transactions: Transaction[] = [
     type: "Suite",
     checkIn: "2026-11-10",
     checkOut: "2026-11-12",
-    status: "Selesai",
-    payment: "Lunas",
+    status: "Completed",
+    payment: "Paid",
     total: 650000,
   },
 ];
@@ -137,7 +137,7 @@ function formatRupiah(value: number) {
 }
 
 function formatDate(value: string) {
-  return new Date(value + "T00:00:00").toLocaleDateString("id-ID", {
+  return new Date(value + "T00:00:00").toLocaleDateString("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -190,7 +190,7 @@ export default function AdminReportsPage() {
   const [appliedEnd, setAppliedEnd] = useState(getToday());
 
   const [search, setSearch] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState("Semua status");
+  const [paymentFilter, setPaymentFilter] = useState("All Statuses");
 
   const [dateError, setDateError] = useState("");
 
@@ -218,15 +218,15 @@ export default function AdminReportsPage() {
         item.guest.toLowerCase().includes(search.toLowerCase()) ||
         item.type.toLowerCase().includes(search.toLowerCase());
 
-      const matchesPayment = paymentFilter === "Semua status" || item.payment === paymentFilter;
+      const matchesPayment = paymentFilter === "All Statuses" || item.payment === paymentFilter;
 
       return matchesDate && matchesSearch && matchesPayment;
     });
   }, [appliedStart, appliedEnd, search, paymentFilter]);
 
   const transactionSummary = useMemo(() => {
-    const paid = filteredTransactions.filter((item) => item.payment === "Lunas");
-    const unpaid = filteredTransactions.filter((item) => item.payment === "Belum bayar");
+    const paid = filteredTransactions.filter((item) => item.payment === "Paid");
+    const unpaid = filteredTransactions.filter((item) => item.payment === "Unpaid");
 
     return {
       total: filteredTransactions.length,
@@ -237,12 +237,12 @@ export default function AdminReportsPage() {
 
   function applyDateFilter() {
     if (!startDate || !endDate) {
-      setDateError("Tanggal awal dan akhir harus diisi.");
+      setDateError("Start and end dates are required.");
       return;
     }
 
     if (startDate > endDate) {
-      setDateError("Tanggal awal tidak boleh melebihi tanggal akhir.");
+      setDateError("The start date cannot be later than the end date.");
       return;
     }
 
@@ -281,15 +281,15 @@ export default function AdminReportsPage() {
       <div className="min-h-screen min-w-0 w-full md:ml-[210px] md:w-[calc(100%-210px)]">
         <AdminTopbar />
 
-        {/* Ruang untuk Topbar fixed */}
+        {/* Spacing for the fixed Topbar */}
         <div className="h-[60px] md:h-[50px]" />
 
         <main className="w-full min-w-0 px-4 pb-6 pt-5 sm:px-6 md:px-6 md:pt-6 lg:px-8">
           <div className="min-w-0 rounded-2xl border border-[#E8DED0] bg-[#FFFDFA] px-3 pb-5 pt-3 sm:px-5 lg:px-7">
-            {/* Filter Periode */}
+            {/* Date Range Filter */}
             <div className="mb-4 grid grid-cols-1 items-end gap-3 sm:flex sm:flex-wrap">
               <div className="flex min-w-0 flex-col gap-1">
-                <label className="text-[12px] font-medium text-gray-600">Dari</label>
+                <label className="text-[12px] font-medium text-gray-600">From</label>
                 <input
                   type="date"
                   value={startDate}
@@ -300,7 +300,7 @@ export default function AdminReportsPage() {
               </div>
 
               <div className="flex min-w-0 flex-col gap-1">
-                <label className="text-[12px] font-medium text-gray-600">Sampai</label>
+                <label className="text-[12px] font-medium text-gray-600">To</label>
                 <input
                   type="date"
                   value={endDate}
@@ -314,13 +314,13 @@ export default function AdminReportsPage() {
                 onClick={applyDateFilter}
                 className="h-9 w-full rounded-xl bg-[#C6A46A] px-5 text-[14px] font-semibold text-[#192B35] transition hover:bg-[#B8955D] sm:h-8 sm:w-auto"
               >
-                Terapkan
+                Apply
               </button>
             </div>
 
             {dateError && <p className="mb-4 text-xs text-red-600">{dateError}</p>}
 
-            {/* Tab Laporan */}
+            {/* Report Tabs */}
             <div className="mb-5 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               <button
                 onClick={() => setActiveTab("occupancy")}
@@ -330,7 +330,7 @@ export default function AdminReportsPage() {
                     : "border-[#E5D9C8] bg-white text-[#192B35] hover:bg-[#F7F3EC]"
                 }`}
               >
-                Okupansi kamar
+                Room Occupancy
               </button>
 
               <button
@@ -341,52 +341,52 @@ export default function AdminReportsPage() {
                     : "border-[#E5D9C8] bg-white text-[#192B35] hover:bg-[#F7F3EC]"
                 }`}
               >
-                Transaksi &amp; pembayaran
+                Transactions & Payments
               </button>
             </div>
 
-            {/* TAB OKUPANSI */}
+            {/* OCCUPANCY TAB */}
             {activeTab === "occupancy" && (
               <>
-                {/* Ringkasan Okupansi */}
+                {/* Occupancy Summary */}
                 <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
                   <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#C6A46A] bg-white p-4 sm:p-5">
                     <p className="text-3xl font-semibold text-[#192B35]">{averageOccupancy}%</p>
-                    <p className="mt-1 text-sm text-gray-500">Rata-rata keterisian</p>
+                    <p className="mt-1 text-sm text-gray-500">Average Occupancy</p>
                   </div>
 
                   <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#A5B1A0] bg-white p-4 sm:p-5">
                     <p className="text-3xl font-semibold text-[#192B35]">{dateRange.length}</p>
-                    <p className="mt-1 text-sm text-gray-500">Hari dalam periode</p>
+                    <p className="mt-1 text-sm text-gray-500">Days in Period</p>
                   </div>
 
                   <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#192B35] bg-white p-4 sm:col-span-2 sm:p-5 md:col-span-1">
                     <p className="text-3xl font-semibold text-[#192B35]">{ACTIVE_ROOMS}</p>
-                    <p className="mt-1 text-sm text-gray-500">Kamar aktif</p>
+                    <p className="mt-1 text-sm text-gray-500">Active Rooms</p>
                   </div>
                 </div>
 
-                {/* Pencarian */}
+                {/* Search */}
                 <div className="mb-4 flex flex-wrap items-center gap-3">
                   <input
                     type="text"
-                    placeholder="Cari tanggal..."
+                    placeholder="Search date..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="h-9 w-full max-w-none rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] outline-none focus:border-[#C6A46A] sm:h-8 sm:max-w-[280px]"
                   />
                 </div>
 
-                {/* Tabel Okupansi */}
+                {/* Occupancy Table */}
                 <div className="w-full overflow-x-auto">
                   <table className="w-full min-w-[650px] table-fixed text-left text-xs md:min-w-0">
                     <thead className="border-b border-[#E5D9C8] text-xs uppercase text-gray-500">
                       <tr>
-                        <th className="w-[24%] px-3 py-4 font-medium">Tanggal</th>
-                        <th className="w-[15%] px-3 py-4 font-medium">Terisi</th>
-                        <th className="w-[18%] px-3 py-4 font-medium">Dipesan</th>
-                        <th className="w-[18%] px-3 py-4 font-medium">Kosong</th>
-                        <th className="w-[25%] px-3 py-4 font-medium">Keterisian</th>
+                        <th className="w-[24%] px-3 py-4 font-medium">Date</th>
+                        <th className="w-[15%] px-3 py-4 font-medium">Occupied</th>
+                        <th className="w-[18%] px-3 py-4 font-medium">Reserved</th>
+                        <th className="w-[18%] px-3 py-4 font-medium">Available</th>
+                        <th className="w-[25%] px-3 py-4 font-medium">Occupancy</th>
                       </tr>
                     </thead>
 
@@ -406,7 +406,7 @@ export default function AdminReportsPage() {
                       {occupancyData.filter((item) => item.date.includes(search)).length === 0 && (
                         <tr>
                           <td colSpan={5} className="px-3 py-10 text-center text-gray-400">
-                            Tidak ada data okupansi.
+                            No occupancy data available.
                           </td>
                         </tr>
                       )}
@@ -416,38 +416,38 @@ export default function AdminReportsPage() {
               </>
             )}
 
-            {/* TAB TRANSAKSI */}
+            {/* TRANSACTIONS TAB */}
             {activeTab === "transactions" && (
               <>
-                {/* Ringkasan Transaksi */}
+                {/* Transaction Summary */}
                 <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
                   <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#C6A46A] bg-white p-4 sm:p-5">
                     <p className="text-3xl font-semibold text-[#192B35]">
                       {transactionSummary.total}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">Transaksi</p>
+                    <p className="mt-1 text-sm text-gray-500">Transactions</p>
                   </div>
 
                   <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#A5B1A0] bg-white p-4 sm:p-5">
                     <p className="break-words text-2xl font-semibold text-[#192B35]">
                       {formatRupiah(transactionSummary.paid)}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">Lunas</p>
+                    <p className="mt-1 text-sm text-gray-500">Paid</p>
                   </div>
 
                   <div className="rounded-2xl border border-[#E8DED0] border-t-[5px] border-t-[#192B35] bg-white p-4 sm:col-span-2 sm:p-5 md:col-span-1">
                     <p className="break-words text-2xl font-semibold text-[#192B35]">
                       {formatRupiah(transactionSummary.unpaid)}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">Belum dibayar</p>
+                    <p className="mt-1 text-sm text-gray-500">Unpaid</p>
                   </div>
                 </div>
 
-                {/* Pencarian dan Filter Status */}
+                {/* Search and Payment Filter */}
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                   <input
                     type="text"
-                    placeholder="Cari..."
+                    placeholder="Search..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="h-9 w-full rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] outline-none focus:border-[#C6A46A] sm:h-8 sm:w-[280px]"
@@ -458,23 +458,23 @@ export default function AdminReportsPage() {
                     onChange={(e) => setPaymentFilter(e.target.value)}
                     className="h-9 w-full rounded-xl border border-[#E5D9C8] bg-[#F7F3EC] px-3 text-[12px] text-[#192B35] outline-none focus:border-[#C6A46A] sm:h-8 sm:w-auto"
                   >
-                    <option>Semua status</option>
-                    <option>Lunas</option>
-                    <option>Belum bayar</option>
+                    <option>All Statuses</option>
+                    <option>Paid</option>
+                    <option>Unpaid</option>
                   </select>
                 </div>
 
-                {/* Tabel Transaksi */}
+                {/* Transaction Table */}
                 <div className="w-full overflow-x-auto">
                   <table className="w-full min-w-[900px] table-fixed text-left text-xs md:min-w-0">
                     <thead className="border-b border-[#E5D9C8] text-xs uppercase text-gray-500">
                       <tr>
                         <th className="w-[8%] px-3 py-4 font-medium">ID</th>
-                        <th className="w-[16%] px-3 py-4 font-medium">Tamu</th>
-                        <th className="w-[11%] px-3 py-4 font-medium">Tipe</th>
-                        <th className="w-[23%] px-3 py-4 font-medium">Tanggal</th>
+                        <th className="w-[16%] px-3 py-4 font-medium">Guest</th>
+                        <th className="w-[11%] px-3 py-4 font-medium">Type</th>
+                        <th className="w-[23%] px-3 py-4 font-medium">Dates</th>
                         <th className="w-[13%] px-3 py-4 font-medium">Status</th>
-                        <th className="w-[15%] px-3 py-4 font-medium">Pembayaran</th>
+                        <th className="w-[15%] px-3 py-4 font-medium">Payment</th>
                         <th className="w-[14%] px-3 py-4 font-medium">Total</th>
                       </tr>
                     </thead>
@@ -491,9 +491,9 @@ export default function AdminReportsPage() {
                           <td className="px-3 py-4">
                             <span
                               className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs ${
-                                item.status === "Check-in"
+                                item.status === "Checked In"
                                   ? "bg-[#E2E9E0] text-[#49664E]"
-                                  : item.status === "Dipesan"
+                                  : item.status === "Reserved"
                                     ? "bg-[#F4E7C9] text-[#8A6A2E]"
                                     : "bg-[#EEEAE3] text-[#68645D]"
                               }`}
@@ -504,7 +504,7 @@ export default function AdminReportsPage() {
                           <td className="px-3 py-4">
                             <span
                               className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs ${
-                                item.payment === "Lunas"
+                                item.payment === "Paid"
                                   ? "bg-[#E2E9E0] text-[#49664E]"
                                   : "bg-[#F3DAD5] text-[#A45E52]"
                               }`}
@@ -521,7 +521,7 @@ export default function AdminReportsPage() {
                       {filteredTransactions.length === 0 && (
                         <tr>
                           <td colSpan={7} className="px-3 py-10 text-center text-gray-400">
-                            Tidak ada transaksi pada periode ini.
+                            No transactions found for this period.
                           </td>
                         </tr>
                       )}
@@ -533,7 +533,7 @@ export default function AdminReportsPage() {
 
             <div className="mt-5 border-t border-[#E8DED0] pt-4">
               <p className="text-[11px] text-gray-400">
-                Periode laporan: {formatDate(appliedStart)} – {formatDate(appliedEnd)}
+                Report Period: {formatDate(appliedStart)} – {formatDate(appliedEnd)}
               </p>
             </div>
           </div>
