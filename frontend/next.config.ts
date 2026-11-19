@@ -1,9 +1,9 @@
+
 import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // The repo root also contains the backend package and its lockfile.
-  // Keep Turbopack scoped to the frontend workspace.
+  transpilePackages: [],
   agentRules: false,
   turbopack: {
     root: path.resolve(__dirname),
